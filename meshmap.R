@@ -1,26 +1,36 @@
-# creating a big ass heatmap of all mesh co-occurances
-# library
+# creating maps from Mesh
+# first will be a circular map of MeSH coocuurances
+# second will be a heatmap of all mesh co-occurances
+
+# data is from https://ii.nlm.nih.gov/MRCOC.shtml
+# specifically: wget https://ii.nlm.nih.gov/MRCOC/summary_CoOccurs_2018.txt.gz
+
+# load library
 
 library(dplyr)
 library(ggplot2)
 library(data.table)
 
+# Load DUI to tree number correlations from existing file 
+
+duitrees <- read.csv("duiToTree.csv")
+
+# Load summary correlations
+# only need one of the following
+# this is a huge file if you do it all
+
 summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI2", "Freq"), nrows = 300000000) #get everything
 
-smallsummarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI2", "Freq"), nrows = 300000) #get sample
+summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI2", "Freq"), nrows = 300000) #get sample
 
-summaryallmeta <- fread("summary_CoOccurs_2018.txt", sep = "|", nrows = 3000)
-
-
-# get MeSH correlations based on DUI  -----
-
-# just get a disease state based on DUI for MeSH
-# grep within fread seems to work but doesn't get header out so need to select variables and rename
+summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", nrows = 3000)
 
 
-summarymgdf <- fread("grep D009157 summary_CoOccurs_2018.txt", sep = "|", nrows = 300000) #variable names all fucked up
+# get MeSH correlations based on a specific DUI  -----
 
-summarydf <- summarymgdf %>%
+summarydf <- fread("grep D009157 summary_CoOccurs_2018.txt", sep = "|", nrows = 300000) #variable names all fucked up because of the grep. Also not sure if this is searching properly. Could run on full then use dplyr and compare numbers to figure out how accurate this is
+
+summarydf <- summarydf %>% # fix col names
   select(V1, V3, V5)
 colnames(summarydf)
 colnames(summarydf) <- c("DUI1", "DUI2", "Freq")
@@ -33,42 +43,64 @@ justmg <- df %>%
 
 
 #add tree locations to DUIs ----
-# this is convoluted but works
+# this process massively increases the number of rows in the file. Not sure why this is happening. maybe because of multiple tree locations by DUI?
 
-new <- merge(summarydf, duitrees, by.x = "DUI1", by.y = "dui")
-colnames(new)
-colnames(new)[4] <- "treedui1"
-colnames(new)[5] <-"tdui1"
+# add for DUI1
+summarydf <- merge(summarydf, duitrees, by.x = "DUI1", by.y = "DUI")
+colnames(summarydf)
+colnames(summarydf) <- c("DUI1","DUI2","Freq","subLevelTree1","treeNumber1","topTree1","Name1")
 
-newdf <- merge(new, duitrees, by.x = "DUI2", by.y="dui", allow.cartesian=TRUE) 
 
-treecorrelations <- newdf %>%
-  select(Freq, tdui1, t)
+# add for DUI2
+summarydf <- merge(summarydf, duitrees, by.x = "DUI2", by.y = "DUI", allow.cartesian=TRUE)
+colnames(summarydf)
+colnames(summarydf) <- c("DUI2","DUI1","Freq","subLevelTree1","treeNumber1","topTree1","Name1","subLevelTree2","treeNumber2","topTree2","Name2")
 
-# graph relationship between DUIs and table locations ---
-# both below come from https://rstudio-pubs-static.s3.amazonaws.com/145337_0ecf43312d7b42aaa6b4687649915879.html 
-# this works! 
+
+# ChordDiagram ---------
+# some resources
+# https://rstudio-pubs-static.s3.amazonaws.com/145337_0ecf43312d7b42aaa6b4687649915879.html 
+
 library(circlize)
-freqpairs <- treecorrelations %>% group_by(tdui1, t) %>%
-  summarize(freq = n())
-chordDiagram(freqpairs) # works, don't change above
 
-# try a different circlize
+#get correlations
+
+treecorrelations <- summarydf %>%
+  select(Freq, Name1, Name2)
+
+treecorrelations <- summarydf %>%
+  select(Freq, DUI1, DUI2)
+
+# get summary? 
+
+freqpairs <- treecorrelations %>% group_by(Name1, Name2) %>%
+  summarize(freq = n())
+
+freqpairs <- treecorrelations %>% group_by(DUI1, DUI2) %>%
+  summarize(freq = n())
+
+# create graphs
+
+chordDiagram(freqpairs) 
+
+# try to get text labels rotated so they are readable
+# THIS WORKED
 
 chordDiagram(freqpairs, annotationTrack = "grid", preAllocateTracks = list(track.height = 0.1))
+
 circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
   xlim = get.cell.meta.data("xlim")
   xplot = get.cell.meta.data("xplot")
   ylim = get.cell.meta.data("ylim")
   sector.name = get.cell.meta.data("sector.index")
-  if(abs(xplot[2] - xplot[1]) < 10) {
-    circos.text(mean(xlim), ylim[1], sector.name, facing = "clockwise",
-                niceFacing = TRUE, adj = c(0, 0.5))
-  } else {
-    circos.text(mean(xlim), ylim[1], sector.name, facing = "inside",
-                niceFacing = TRUE, adj = c(0.5, 0))
-  }
+  circos.text(mean(xlim), ylim[1], sector.name, facing = "clockwise",
+              niceFacing = TRUE, adj = c(0, 0.5), cex = 0.4)
 }, bg.border = NA)
+
+# try different 
+
+
+# create heatmaps -----------
 
 #df2 <- df %>%
 #  select(DUI1, DUI2, Freq)

@@ -1,26 +1,49 @@
-# extract descrptors with tree numbers
+#Get clean exported CSV file of MeSH DUIs with multiple levels of MeSH tree numbers
+
+#load libraries
+
 library(stringr)
 
+#get basic file out and converted to just DUIs and full tree numbers
 df <- read.csv("duiToTree.txt", sep="")
 colnames(df) <- c("V1","V2","V3","V4")
 duitrees <- as.data.frame(str_extract(df$V1, "D[0-9]*"))
 colnames(duitrees) <- "dui"
-
 tree1 <- str_extract(df$V3, "[A-Z].*")
 tree2 <- gsub(">", "", tree1)
 treedf <- as.data.frame(tree2)
 colnames(treedf) <- "tree"
-
 duitrees$tree <- treedf$tree
-
-# save the duitrees as csv
-write.csv(duitrees, file = "duiToTree.csv")
 
 
 # get first character of tree locations into its own column
 
-duitrees$t <- substring(treedf$tree, 1, 1)
+duitrees$t <- substring(duitrees$tree, 1, 1)
 
+# get first three character of tree locations into its own column
+
+duitrees$sublevelt <- substring(duitrees$tree, 1, 3)
+
+# import second level tree numbers and add them to file
+
+treenumbers <- read.csv("treenumbers.csv")
+
+# add tree names to duitrees
+
+duitrees <- merge(duitrees, treenumbers, by.x = "sublevelt", by.y = "A")
+
+# fix names
+colnames(duitrees)
+colnames(duitrees) <- c("subLevelTree", "DUI", "treeNumber", "topTree","Name")
+
+# save the duitrees as csv
+write.csv(duitrees, file = "duiToTree.csv", row.names=FALSE)
+
+# visualize the multiple location in tree relationships for MeSH
+
+
+# REST IS PLAYING MAYBE JUNK ------
+# LOOK and see if you should delete below
 # map tree locations for multiple trees
 
 table <- table(duitrees$dui, duitrees$t)
