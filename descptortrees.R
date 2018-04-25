@@ -73,7 +73,7 @@ chordDiagram(freqpairs)
 
 # playing ------
 # Make the circular plot
-chordDiagram(treecorrelations, transparency = 0.5)
+chordDiagram(freqpairs, transparency = 0.5)
 
 set.seed(999)
 mat = matrix(sample(18, 18), 3, 6) 

@@ -5,7 +5,7 @@
 # data is from https://ii.nlm.nih.gov/MRCOC.shtml
 # specifically: wget https://ii.nlm.nih.gov/MRCOC/summary_CoOccurs_2018.txt.gz
 
-# load library
+# load libraries
 
 library(dplyr)
 library(ggplot2)
@@ -23,7 +23,7 @@ summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI
 
 summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI2", "Freq"), nrows = 300000) #get sample
 
-summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", nrows = 3000)
+summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI2", "Freq"), nrows = 3000)
 
 
 # get MeSH correlations based on a specific DUI  -----
@@ -93,19 +93,13 @@ circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
   xplot = get.cell.meta.data("xplot")
   ylim = get.cell.meta.data("ylim")
   sector.name = get.cell.meta.data("sector.index")
-  circos.text(mean(xlim), ylim[1], sector.name, facing = "clockwise",
-              niceFacing = TRUE, adj = c(0, 0.5), cex = 0.4)
+  circos.text(mean(xlim), ylim[1], sector.name, facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5), cex = 0.6)
 }, bg.border = NA)
-
-# try different 
 
 
 # create heatmaps -----------
 
-#df2 <- df %>%
-#  select(DUI1, DUI2, Freq)
-
-ggplot(df, aes(y=DUI1,x=DUI2, fill=Freq)) +
+ggplot(treecorrelations, aes(y=Name1,x=Name2, fill=Freq)) +
   geom_tile() +
   theme(axis.title.y=element_blank(),
         axis.text.y=element_blank(),
