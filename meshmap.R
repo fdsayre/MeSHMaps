@@ -60,6 +60,8 @@ colnames(summarymetadf)
 colnames(summarymetadf) <- c("DUI2","DUI1","Freq","subLevelTree1","treeNumber1","topTree1","Name1","subLevelTree2","treeNumber2","topTree2","Name2")
 
 
+
+
 # ChordDiagram ---------
 # some resources
 # https://rstudio-pubs-static.s3.amazonaws.com/145337_0ecf43312d7b42aaa6b4687649915879.html 
@@ -120,37 +122,16 @@ matrix <- acast(smallsummarymetadf, Name1 ~ Name2)
 chorddiag(matrix, type = "bipartite", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
 
-# the following directional one does not work
-chorddiag(t, type = "directional", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
+# the following directional one does not work with the standard way I have done things, but does work with Lisa's way of using crossprod
+
+test <- crossprod(table(summarymetadf$Name1, summarymetadf$Name2))
+diag(test) <- 0
+chorddiag(test, type = "directional", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
 
 # DUITREE Visualizations ------
 # subLevelTree / Name correlations where they share the same DUI
 # OR: Tree locations that have the same MeSH Terms
-
-tree <- duitrees %>%
-  select(DUI, Name) 
-
-treetable <- as.data.frame(table(tree))
-
-tree <- treetable %>%
-  filter(Freq > 1)
-
-
-treesfreqpairs <- duitrees %>% group_by(DUI, Name) %>%
-  summarize(freq = n())
-
-
-tree2 <- duitrees %>% group_by(subLevelTree, DUI) %>% tally()
-
-tree2 <- duitrees %>% group_by(Name, DUI) %>% tally()
-
-tree2 <- table(duitrees$DUI, duitrees$Name)
-
-tree <- as.data.table(tree2)
-
-tree <- tree %>%
-  filter(N > 0)
 
 tree2 <- crossprod(table(duitrees$DUI, duitrees$Name))
 diag(tree2) <- 0
