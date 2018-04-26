@@ -108,37 +108,25 @@ library(chorddiag)
 matrix <- acast(summarymetadf, Name1 ~ Name2)
 chorddiag(matrix, type = "bipartite", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
-# above works
+chorddiag(matrix, type = "bipartite", showTicks = F, groupnameFontsize = 14, groupnamePadding = 20, margin = 90)
 
-matrix <- as.matrix(freqpairs)
-chorddiag(matrix, type = "directional", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
+# try removing low number results from summarymetadf and then re-using chorddiag to make prettier?
 
-matrix <- data.matrix(freqpairs)
+smallsummarymetadf <- summarymetadf %>%
+  filter(Freq > 2)
+matrix <- acast(smallsummarymetadf, Name1 ~ Name2)
+chorddiag(matrix, type = "bipartite", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
-df <- all %>%
-  filter(DUI1 == "D008910" | DUI2 == "D008910") %>%
-  select(DUI1, DUI2)
 
-matrix <- data.matrix(df)
+# the following directional one does not work
+chorddiag(t, type = "directional", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
-levs <- unique(unlist(df, use.names = FALSE))
-t <- table(lapply(dt, factor, levs))
 
-t <- dcast(lapply(dt, factor, df), DUI1 ~ DUI2, drop = FALSE,
-      value.var = "DUI2", fun.aggregate = length)
-
-# nothing above working
-
-library(reshape2)
-
-t <- acast(summarydf, DUI1 ~ DUI2)
-
-matrix <- acast(summarymetadf, Name1 ~ Name2)
 
 
 # create heatmaps -----------
 
-ggplot(summarydf, aes(y=Name1,x=Name2, fill=Freq)) +
+ggplot(summarymetadf, aes(y=DUI1,x=DUI2, fill=Freq)) +
   geom_tile() +
   theme(axis.title.y=element_blank(),
         axis.text.y=element_blank(),
@@ -148,7 +136,7 @@ ggplot(summarydf, aes(y=Name1,x=Name2, fill=Freq)) +
         axis.ticks.x=element_blank()) +
   scale_fill_continuous(high = "#132B43", low = "#56B1F7")
 
-ggplot(matrix, aes(y=DUI1,x=DUI2, fill=Freq)) +
+ggplot(summarydf, aes(y=DUI1,x=DUI2, fill=Freq)) +
   geom_tile() +
   theme(axis.title.y=element_blank(),
         axis.text.y=element_blank(),
@@ -167,7 +155,7 @@ require(reshape2)
 casted <- acast(summarydf, DUI2 ~ DUI1, value.var = "Freq")
 
 
-heatmap(matrix, xlab = NULL, ylab = NULL, key.xlab = NA, key.ylab = NA)
+heatmap(casted, xlab = NULL, ylab = NULL, key.xlab = NA, key.ylab = NA)
 
 heatmap(matrix, xlab = NULL, ylab = NULL, key.xlab = NA, key.ylab = NA, Colv = NA, Rowv = NA)
 
