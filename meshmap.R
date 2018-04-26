@@ -170,6 +170,7 @@ circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
 library(reshape2)
 tmatrix <- acast(tree, DUI ~ Name)
 chorddiag(tree2, type = "bipartite", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
+chorddiag(tree2, type = "directional", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
 
 # create heatmaps -----------
