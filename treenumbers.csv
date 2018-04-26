@@ -1,76 +1,76 @@
 Anatomy,A
-BodyRegions,A01
-MusculoskeletalSystem,A02
-DigestiveSystem,A03
-RespiratorySystem,A04
-UrogenitalSystem,A05
-EndocrineSystem,A06
-CardiovascularSystem,A07
-NervousSystem,A08
-SenseOrgans,A09
+Body Regions,A01
+Musculoskeletal System,A02
+Digestive System,A03
+Respiratory System,A04
+Urogenital System,A05
+Endocrine System,A06
+Cardiovascular System,A07
+Nervous System,A08
+Sense Organs,A09
 Tissues,A10
 Cells,A11
-FluidsandSecretions,A12
-AnimalStructures,A13
-StomatognathicSystem,A14
-HemicandImmuneSystems,A15
-EmbryonicStructures,A16
-IntegumentarySystem,A17
-PlantStructures,A18
-FungalStructures,A19
-BacterialStructures,A20
-ViralStructures,A21
+Fluids and Secretions,A12
+Animal Structures,A13
+Stomatognathic System,A14
+HemicandImmune Systems,A15
+Embryonic Structures,A16
+Integumentary System,A17
+Plant Structures,A18
+Fungal Structures,A19
+Bacterial Structures,A20
+Viral Structures,A21
 Organisms,B
 Eukaryota,B01
 Archaea,B02
 Bacteria,B03
 Viruses,B04
-OrganismForms,B05
+Organism Forms,B05
 Diseases,C
-BacterialInfectionsandMycoses,C01
-VirusDiseases,C02
-ParasiticDiseases,C03
+Bacterial InfectionsandMycoses,C01
+Virus Diseases,C02
+Parasitic Diseases,C03
 Neoplasms,C04
-MusculoskeletalDiseases,C05
-DigestiveSystemDiseases,C06
-StomatognathicDiseases,C07
-RespiratoryTractDiseases,C08
-OtorhinolaryngologicDiseases,C09
-NervousSystemDiseases,C10
-EyeDiseases,C11
-MaleUrogenitalDiseases,C12
-FemaleUrogenitalDiseasesandPregnancyComplications,C13
-CardiovascularDiseases,C14
-HemicandLymphaticDiseases,C15
-Congenital,Hereditary,andNeonatalDiseasesandAbnormalities,C16
-SkinandConnectiveTissueDiseases,C17
-NutritionalandMetabolicDiseases,C18
-EndocrineSystemDiseases,C19
-ImmuneSystemDiseases,C20
-DisordersofEnvironmentalOrigin,C21
-AnimalDiseases,C22
-PathologicalConditions,SignsandSymptoms,C23
-OccupationalDiseases,C24
-Chemically-InducedDisorders,C25
-WoundsandInjuries,C26
-ChemicalsandDrugs,D
-InorganicChemicals,D01
-OrganicChemicals,D02
-HeterocyclicCompounds,D03
-PolycyclicCompounds,D04
-MacromolecularSubstances,D05
-Hormones,HormoneSubstitutes,andHormoneAntagonists,D06
-EnzymesandCoenzymes,D08
+Musculoskeletal Diseases,C05
+Digestive System Diseases,C06
+Stomatognathic Diseases,C07
+Respiratory Tract Diseases,C08
+Otorhinolaryngologic Diseases,C09
+Nervous System Diseases,C10
+Eye Diseases,C11
+Male Urogenital Diseases,C12
+Female Urogenital Diseases and Pregnancy Complications,C13
+Cardiovascular Diseases,C14
+Hemic and Lymphatic Diseases,C15
+Congenital, Hereditary, and Neonatal Diseases and Abnormalities,C16
+Skin and Connective Tissue Diseases,C17
+Nutritional and Metabolic Diseases,C18
+Endocrine System Diseases,C19
+Immune System Diseases,C20
+Disorders of Environmental Origin,C21
+Animal Diseases,C22
+Pathological Conditions, Signs and Symptoms,C23
+Occupational Diseases,C24
+Chemically-Induced Disorders,C25
+Wounds and Injuries,C26
+Chemicals and Drugs,D
+Inorganic Chemicals,D01
+Organic Chemicals,D02
+Heterocyclic Compounds,D03
+Polycyclic Compounds,D04
+Macromolecular Substances,D05
+Hormones, Hormone Substitutes, and Hormone Antagonists,D06
+Enzymes and Coenzymes,D08
 Carbohydrates,D09
 Lipids,D10
-AminoAcids,Peptides,andProteins,D12
-NucleicAcids,Nucleotides,andNucleosides,D13
-ComplexMixtures,D20
-BiologicalFactors,D23
-BiomedicalandDentalMaterials,D25
-PharmaceuticalPreparations,D26
-ChemicalActionsandUses,D27
-Analytical,DiagnosticandTherapeuticTechniques,andEquipment,E
+Amino Acids, Peptides, and Proteins,D12
+Nucleic Acids,Nucleotides,and Nucleosides,D13
+Complex Mixtures,D20
+Biological Factors,D23
+Biomedical and Dental Materials,D25
+Pharmaceutical Preparations,D26
+Chemical Actions and Uses,D27
+Analytical, Diagnostic and Therapeutic Techniques, and Equipment,E
 Diagnosis,E01
 Therapeutics,E02
 AnesthesiaandAnalgesia,E03
