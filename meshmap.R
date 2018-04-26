@@ -105,6 +105,8 @@ circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
 
 devtools::install_github("mattflor/chorddiag")
 library(chorddiag)
+library(reshape2)
+
 matrix <- acast(summarymetadf, Name1 ~ Name2)
 chorddiag(matrix, type = "bipartite", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
@@ -122,6 +124,52 @@ chorddiag(matrix, type = "bipartite", showTicks = F, groupnameFontsize = 14, gro
 chorddiag(t, type = "directional", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
 
+# DUITREE Visualizations ------
+# subLevelTree / Name correlations where they share the same DUI
+# OR: Tree locations that have the same MeSH Terms
+
+tree <- duitrees %>%
+  select(DUI, Name) 
+
+treetable <- as.data.frame(table(tree))
+
+tree <- treetable %>%
+  filter(Freq > 1)
+
+
+treesfreqpairs <- duitrees %>% group_by(DUI, Name) %>%
+  summarize(freq = n())
+
+
+tree2 <- duitrees %>% group_by(subLevelTree, DUI) %>% tally()
+
+tree2 <- duitrees %>% group_by(Name, DUI) %>% tally()
+
+tree2 <- table(duitrees$DUI, duitrees$Name)
+
+tree <- as.data.table(tree2)
+
+tree <- tree %>%
+  filter(N > 0)
+
+tree2 <- crossprod(table(duitrees$DUI, duitrees$Name))
+diag(tree2) <- 0
+
+circos.clear()
+
+chordDiagram(tree2, annotationTrack = "grid", preAllocateTracks = list(track.height = 0.1))
+
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  xplot = get.cell.meta.data("xplot")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  circos.text(mean(xlim), ylim[1], sector.name, facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5), cex = 0.6)
+}, bg.border = NA)
+
+library(reshape2)
+tmatrix <- acast(tree, DUI ~ Name)
+chorddiag(tree2, type = "bipartite", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
 
 
 # create heatmaps -----------
