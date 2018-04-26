@@ -19,7 +19,7 @@ duitrees <- read.csv("duiToTree.csv")
 # only need one of the following
 # this is a huge file if you do it all
 
-summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI2", "Freq"), nrows = 300000000) #get everything
+all <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI2", "Freq"), nrows = 300000000) #get everything
 
 summarydf <- fread("summary_CoOccurs_2018.txt", sep = "|", select=c("DUI1", "DUI2", "Freq"), nrows = 300000) #get sample
 
@@ -37,24 +37,27 @@ colnames(summarydf) <- c("DUI1", "DUI2", "Freq")
 
 
 # alternative way to do above
+# librarians D016245
+# mg D009157
+#canada D002170
 
-justmg <- df %>%
-  filter(DUI1 == "D009157" | DUI2 == "D009157")
+summarydf <- all %>%
+  filter(DUI1 == "D008910" | DUI2 == "D008910")
 
 
 #add tree locations to DUIs ----
 # this process massively increases the number of rows in the file. Not sure why this is happening. maybe because of multiple tree locations by DUI?
 
 # add for DUI1
-summarydf <- merge(summarydf, duitrees, by.x = "DUI1", by.y = "DUI")
-colnames(summarydf)
-colnames(summarydf) <- c("DUI1","DUI2","Freq","subLevelTree1","treeNumber1","topTree1","Name1")
+summarymetadf <- merge(summarydf, duitrees, by.x = "DUI1", by.y = "DUI")
+colnames(summarymetadf)
+colnames(summarymetadf) <- c("DUI1","DUI2","Freq","subLevelTree1","treeNumber1","topTree1","Name1")
 
 
 # add for DUI2
-summarydf <- merge(summarydf, duitrees, by.x = "DUI2", by.y = "DUI", allow.cartesian=TRUE)
-colnames(summarydf)
-colnames(summarydf) <- c("DUI2","DUI1","Freq","subLevelTree1","treeNumber1","topTree1","Name1","subLevelTree2","treeNumber2","topTree2","Name2")
+summarymetadf <- merge(summarymetadf, duitrees, by.x = "DUI2", by.y = "DUI", allow.cartesian=TRUE)
+colnames(summarymetadf)
+colnames(summarymetadf) <- c("DUI2","DUI1","Freq","subLevelTree1","treeNumber1","topTree1","Name1","subLevelTree2","treeNumber2","topTree2","Name2")
 
 
 # ChordDiagram ---------
@@ -65,10 +68,10 @@ library(circlize)
 
 #get correlations
 
-treecorrelations <- summarydf %>%
+treecorrelations <- summarymetadf %>%
   select(Freq, Name1, Name2)
 
-treecorrelations <- summarydf %>%
+treecorrelations <- summarymetadf %>%
   select(Freq, DUI1, DUI2)
 
 # get summary? 
@@ -86,6 +89,8 @@ chordDiagram(freqpairs)
 # try to get text labels rotated so they are readable
 # THIS WORKED
 
+circos.clear()
+
 chordDiagram(freqpairs, annotationTrack = "grid", preAllocateTracks = list(track.height = 0.1))
 
 circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
@@ -96,10 +101,44 @@ circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
   circos.text(mean(xlim), ylim[1], sector.name, facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5), cex = 0.6)
 }, bg.border = NA)
 
+# try another Chord Diagram utilizing D3
+
+devtools::install_github("mattflor/chorddiag")
+library(chorddiag)
+matrix <- acast(summarymetadf, Name1 ~ Name2)
+chorddiag(matrix, type = "bipartite", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
+
+# above works
+
+matrix <- as.matrix(freqpairs)
+chorddiag(matrix, type = "directional", showTicks = F, groupnameFontsize = 14, groupnamePadding = 10, margin = 90)
+
+matrix <- data.matrix(freqpairs)
+
+df <- all %>%
+  filter(DUI1 == "D008910" | DUI2 == "D008910") %>%
+  select(DUI1, DUI2)
+
+matrix <- data.matrix(df)
+
+levs <- unique(unlist(df, use.names = FALSE))
+t <- table(lapply(dt, factor, levs))
+
+t <- dcast(lapply(dt, factor, df), DUI1 ~ DUI2, drop = FALSE,
+      value.var = "DUI2", fun.aggregate = length)
+
+# nothing above working
+
+library(reshape2)
+
+t <- acast(summarydf, DUI1 ~ DUI2)
+
+matrix <- acast(summarymetadf, Name1 ~ Name2)
+
 
 # create heatmaps -----------
 
-ggplot(treecorrelations, aes(y=Name1,x=Name2, fill=Freq)) +
+ggplot(summarydf, aes(y=Name1,x=Name2, fill=Freq)) +
   geom_tile() +
   theme(axis.title.y=element_blank(),
         axis.text.y=element_blank(),
@@ -109,7 +148,7 @@ ggplot(treecorrelations, aes(y=Name1,x=Name2, fill=Freq)) +
         axis.ticks.x=element_blank()) +
   scale_fill_continuous(high = "#132B43", low = "#56B1F7")
 
-ggplot(justmg, aes(y=DUI1,x=DUI2, fill=Freq)) +
+ggplot(matrix, aes(y=DUI1,x=DUI2, fill=Freq)) +
   geom_tile() +
   theme(axis.title.y=element_blank(),
         axis.text.y=element_blank(),
@@ -118,24 +157,24 @@ ggplot(justmg, aes(y=DUI1,x=DUI2, fill=Freq)) +
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank()) 
 
-ggplot(biggermg, aes(y=DUI1,x=DUI2, fill=Freq)) +
+ggplot(summarydf, aes(y=DUI1,x=DUI2, fill=Freq)) +
   geom_tile() +
   scale_fill_continuous(high = "#132B43", low = "#56B1F7")
 
 # heatmap from base stats package that needs input to be matrix format -- 
 # try melt? or acast?
 require(reshape2)
-casted <- acast(smalldf, DUI2 ~ DUI1, value.var = "Freq")
+casted <- acast(summarydf, DUI2 ~ DUI1, value.var = "Freq")
 
 
-heatmap(casted, xlab = NULL, ylab = NULL, key.xlab = NA, key.ylab = NA)
+heatmap(matrix, xlab = NULL, ylab = NULL, key.xlab = NA, key.ylab = NA)
 
-heatmap(casted, xlab = NULL, ylab = NULL, key.xlab = NA, key.ylab = NA, Colv = NA, Rowv = NA)
+heatmap(matrix, xlab = NULL, ylab = NULL, key.xlab = NA, key.ylab = NA, Colv = NA, Rowv = NA)
 
 
 ## Heatmap.2
 library(gplots)
-heatmap.2(casted, xlab = NULL, ylab = NULL, dendrogram = NULL, key.xlab = NA, key.ylab = NA)
+heatmap.2(matrix, xlab = NULL, ylab = NULL, dendrogram = NULL, key.xlab = NA, key.ylab = NA)
 
 
 ## Latice ----
@@ -146,7 +185,7 @@ require(lattice)
 head(df)
 
 # The use of levelplot is really easy then :
-levelplot(casted)
+levelplot(matrix)
 
 levelplot(casted, data = NULL)
 
