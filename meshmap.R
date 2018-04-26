@@ -42,7 +42,7 @@ colnames(summarydf) <- c("DUI1", "DUI2", "Freq")
 #canada D002170
 
 summarydf <- all %>%
-  filter(DUI1 == "D008910" | DUI2 == "D008910")
+  filter(DUI1 == "D009157" | DUI2 == "D009157")
 
 
 #add tree locations to DUIs ----
